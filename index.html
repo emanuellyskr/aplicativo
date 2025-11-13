@@ -1,1 +1,60 @@
+snackschool-app/
+│
+├── backend/           # API (Node.js + Express)
+│   ├── server.js
+│   ├── routes/
+│   ├── models/
+│   └── database/
+│
+├── frontend/          # App (React Native ou Flutter)
+│   ├── App.js
+│   ├── screens/
+│   ├── components/
+│   └── assets/
+│
+└── README.md          # Documentação do projeto
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Conexão com o MongoDB
+mongoose.connect("mongodb://localhost:27017/snackschool");
+
+// Modelo do produto
+const Produto = mongoose.model("Produto", {
+  nome: String,
+  preco: Number,
+  imagem: String
+});
+
+// Modelo do pedido
+const Pedido = mongoose.model("Pedido", {
+  aluno: String,
+  itens: Array,
+  total: Number,
+  status: { type: String, default: "Preparando" }
+});
+
+// Rotas
+app.get("/produtos", async (req, res) => {
+  const produtos = await Produto.find();
+  res.json(produtos);
+});
+
+app.post("/pedido", async (req, res) => {
+  const pedido = new Pedido(req.body);
+  await pedido.save();
+  res.json({ mensagem: "Pedido recebido com sucesso!" });
+});
+
+app.get("/pedidos", async (req, res) => {
+  const pedidos = await Pedido.find();
+  res.json(pedidos);
+});
+
+app.listen(3001, () => console.log("✅ Servidor rodando em http://localhost:3001"));
 
